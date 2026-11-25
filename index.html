@@ -67,6 +67,23 @@ section { padding: clamp(34px, 5vw, 59px) 0; border-bottom: 1px solid var(--line
 .fill { height: 100%; width: var(--width); border-radius: 1px; background: linear-gradient(90deg, #168ed6, var(--bright)); }
 .fill.prior { background: #2d84bd; }
 .chart .metric { color: var(--bright); font-size: 1.62rem; line-height: 1.15; margin: 15px 0 0; }
+.valuation-chart { margin-bottom: 22px; }
+.valuation-header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; }
+.valuation-chart .valuation-change { color: var(--bright); font-family: var(--mono); }
+.valuation-plot { position: relative; height: clamp(130px, 22vw, 235px); margin: 42px 24px 20px 34px; }
+.gridline { position: absolute; inset-inline: 0; bottom: var(--level); border-top: 1px solid var(--line); }
+.gridline span { position: absolute; right: calc(100% + 8px); top: -.8em; color: var(--muted); font: .8rem/1.6 var(--mono); }
+.valuation-line {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #168ed6, var(--bright));
+  clip-path: polygon(0% calc(96% - 1.5px), 18.056% calc(87.667% - 1.5px), 61.111% calc(69.667% - 1.5px), 100% -1.5px, 100% 1.5px, 61.111% calc(69.667% + 1.5px), 18.056% calc(87.667% + 1.5px), 0% calc(96% + 1.5px));
+}
+.valuation-point { position: absolute; left: var(--x); bottom: var(--y); width: 10px; height: 10px; transform: translate(-50%, 50%); border: 2px solid var(--panel); border-radius: 50%; background: var(--bright); box-shadow: 0 0 0 1px var(--bright); }
+.valuation-point span { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); color: var(--text); font: 600 .875rem var(--mono); white-space: nowrap; padding: 2px 4px; background: var(--panel); }
+.valuation-dates { list-style: none; padding: 14px 0 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 12px; color: var(--muted); font-size: .85rem; }
+.valuation-dates b { display: block; color: var(--text); white-space: nowrap; }
+.analytics-details .table-wrap { margin-top: 0; }
 .table-wrap { overflow-x: auto; margin-top: 18px; }
 table { border-collapse: collapse; width: 100%; text-align: left; font-variant-numeric: tabular-nums; }
 th, td { padding: 10px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -88,15 +105,28 @@ tbody th { font-weight: 600; }
 @media (max-width: 820px) {
   .wrap { width: calc(100% - 36px); }
   .hero-grid, .forecast-grid { grid-template-columns: minmax(0, 1fr); }
+  .analytics-details { grid-template-columns: minmax(0, 1fr); }
   .architecture { max-width: 620px; }
   .three { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 600px) {
   .two { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .card { padding: 15px; }
-  .data-table { min-width: 540px; }
-  .forecast-grid table { min-width: 340px; }
+  th, td { padding: 8px; }
+  .data-table { table-layout: fixed; }
+  .data-table thead th:first-child { width: 26%; }
+  .data-table thead th:last-child { width: 30%; }
+  .data-table th, .data-table td { overflow-wrap: anywhere; }
+  .date { white-space: normal; }
+  .data-table .result { white-space: normal; }
+  .valuation-dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .node { grid-template-columns: 1fr; gap: 1px; }
+}
+@media (max-width: 480px) {
+  html { scroll-padding-top: 110px; }
+  nav { flex-wrap: wrap; justify-content: center; column-gap: 14px; row-gap: 3px; padding-block: 6px; }
+  nav a { display: flex; align-items: center; min-height: 32px; }
+  th, td { font-size: .85rem; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 @media print {
@@ -163,21 +193,38 @@ tbody th { font-weight: 600; }
   <section id="analytics">
     <div class="wrap">
       <div class="section-title"><h2>Финансовая аналитика</h2><p class="sub">2023–2026 · Доллары США</p></div>
-      <div class="two">
-        <figure class="card chart">
-          <figcaption><h3>Оценка капитала на раундах</h3><p class="sub">Млрд долларов</p></figcaption>
-          <div class="bar-row"><span>Дек. 2023</span><div class="track" aria-hidden="true"><div class="fill prior" style="--width:30.33%"></div></div><b>9,1</b></div>
-          <div class="bar-row"><span>Апр. 2026</span><div class="track" aria-hidden="true"><div class="fill" style="--width:100%"></div></div><b>30,0</b></div>
-          <p class="metric">3,30×</p><p class="sub">Рост оценки капитала между Series E и Series F</p>
+        <figure class="card chart valuation-chart">
+          <figcaption class="valuation-header">
+            <div><h3>Оценка капитала на раундах</h3><p class="sub">Млрд долларов · апрель 2020 — апрель 2026</p></div>
+            <p class="valuation-change">3,30× между Series E и F</p>
+          </figcaption>
+          <div class="valuation-plot" aria-hidden="true">
+            <div class="gridline" style="--level:0%"><span>0</span></div>
+            <div class="gridline" style="--level:33.333%"><span>10</span></div>
+            <div class="gridline" style="--level:66.667%"><span>20</span></div>
+            <div class="gridline" style="--level:100%"><span>30</span></div>
+            <div class="valuation-line"></div>
+            <div class="valuation-point" style="--x:0%;--y:4%"><span>1,2</span></div>
+            <div class="valuation-point" style="--x:18.056%;--y:12.333%"><span>3,7</span></div>
+            <div class="valuation-point" style="--x:61.111%;--y:30.333%"><span>9,1</span></div>
+            <div class="valuation-point" style="--x:100%;--y:100%"><span>30,0</span></div>
+          </div>
+          <ol class="valuation-dates" aria-label="Даты и оценки капитала на раундах в миллиардах долларов">
+            <li><b>Series C · 1,2</b>Апрель 2020</li>
+            <li><b>Series D · 3,7</b>Май 2021</li>
+            <li><b>Series E · 9,1</b>Декабрь 2023</li>
+            <li><b>Series F · 30,0</b>Апрель 2026</li>
+          </ol>
+          <p class="note">Точки показывают оценки на даты объявления раундов. Линия соединяет эти точки.</p>
           <p class="note">Раунд финансирования — этап, на котором инвесторы покупают доли в компании. Series E и Series F — названия двух таких этапов. Оценка на раунде показывает стоимость всего капитала компании, рассчитанную по цене сделки.</p>
         </figure>
+      <div class="two analytics-details">
         <figure class="card chart">
           <figcaption><h3>Выручка по внешней оценке</h3><p class="sub">Млн долларов</p></figcaption>
           <div class="bar-row"><span>2023</span><div class="track" aria-hidden="true"><div class="fill prior" style="--width:80%"></div></div><b>≈200</b></div>
           <div class="bar-row"><span>2024</span><div class="track" aria-hidden="true"><div class="fill" style="--width:100%"></div></div><b>≈250</b></div>
           <p class="metric">+25%</p><p class="sub">Годовой рост по оценке. 2023 год рассчитан как $250 млн ÷ 1,25.</p>
         </figure>
-      </div>
       <div class="table-wrap" tabindex="0" role="region" aria-label="Публичные показатели VAST Data">
         <table class="data-table">
           <thead><tr><th scope="col">Период</th><th scope="col">Показатель</th><th scope="col">Значение</th></tr></thead>
@@ -188,6 +235,7 @@ tbody th { font-weight: 600; }
             <tr><td class="date">Конец января 2026</td><th scope="row">Законтрактованные годовые регулярные доходы (CARR)</th><td class="result">&gt;$500 млн</td></tr>
           </tbody>
         </table>
+      </div>
       </div>
       <div class="two stat">
         <article class="card"><strong>45,5×</strong><h3>Оценка капитала / ARR</h3><p>Series E · $9,1 млрд ÷ $200 млн ARR на конец 2023 года.</p></article>
